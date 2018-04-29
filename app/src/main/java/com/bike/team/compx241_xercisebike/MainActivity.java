@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import android.view.View;
+import android.widget.Toast;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //tryBluetooth();
+    }
+
+    public void tryBluetooth(View view) {
         try {
             startBluetooth();
         } catch (IOException e) {
@@ -39,7 +46,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void startBluetooth() throws IOException {
 
+        System.out.println("Starting BT");
+
+
+
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+
+        String status;
+        if (mBluetoothAdapter.isEnabled()) {
+            String mydeviceaddress = mBluetoothAdapter.getAddress();
+            String mydevicename = mBluetoothAdapter.getName();
+            status = mydevicename + " : " + mydeviceaddress;
+        }
+        else
+        {
+            status = "Bluetooth is not Enabled.";
+        }
+
+        Toast.makeText(this, status, Toast.LENGTH_LONG).show();
+
+
+
         if (mBluetoothAdapter == null) {
             // Device doesn't support Bluetooth
         } else {
@@ -52,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
                     for(BluetoothDevice tdevice : bondedDevices)
                     {
-                        if(tdevice.getName().equals("ubuntu-0"))
+                        if(tdevice.getName().equals("SM-G389F"))
                         {
                             device = tdevice;
                             break;
@@ -67,9 +95,10 @@ public class MainActivity extends AppCompatActivity {
 //                    BluetoothDevice device = (BluetoothDevice) devices[position];
                     ParcelUuid[] uuids = device.getUuids();
                     BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
-                    //socket.connect();
-                    //outputStream = socket.getOutputStream();
-                    //inStream = socket.getInputStream();
+                    System.out.println(socket.getRemoteDevice());
+                    socket.connect();
+                    outputStream = socket.getOutputStream();
+                    inStream = socket.getInputStream();
                 }
 
                 Log.e("error", "No appropriate paired devices.");
